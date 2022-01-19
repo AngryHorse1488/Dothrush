@@ -1,6 +1,7 @@
 import os, sys
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QPushButton,
     QSizePolicy, QLabel, QFontDialog, QApplication, QFileDialog)
+from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 import functions as fc
 from tensorflow.keras.models import load_model
@@ -15,7 +16,7 @@ class Label:
         #print('adsfhjkl')
 
     def open(nisemono, self):
-        directory = QtWidgets.QFileDialog.getExistingDirectory(caption = "Выберите папку")
+        directory = QtWidgets.QFileDialog.getExistingDirectory(caption = "Выберите папку с классифицированными документами")
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
             #for file_name in os.listdir(directory):  # для каждого файла в директории
             self.path.setText(directory)   # добавить файл в listWidget
@@ -51,7 +52,7 @@ class ExampleAppDialog(QtWidgets.QDialog, dialog.Ui_Dialog): ######DIALOG######
 
     
     def browse_folder(self):
-        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите папку")
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите папку с классифицированными документами")
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
             self.lineEdit.setText(directory)   # добавить файл в listWidget
 
@@ -65,7 +66,7 @@ class ExampleAppDialog(QtWidgets.QDialog, dialog.Ui_Dialog): ######DIALOG######
             if self.labeles_list[i].check.isChecked():
                 path = self.labeles_list[i].path.text()
                 if not os.path.isdir(path):
-                    self.textEdit.append(f'Please select correct paths (incorrect path {i + 1})')
+                    self.textEdit.append(f'Укажите правильный путь (неправильный путь {i + 1})')
                     return
                 paths.append(self.labeles_list[i].path.text())
                 classnames.append(self.labeles_list[i].name.text())
@@ -75,10 +76,10 @@ class ExampleAppDialog(QtWidgets.QDialog, dialog.Ui_Dialog): ######DIALOG######
             try:
                 learning(paths, classnames, modelname)
             except Exception as e:
-                self.textEdit.append('Please select correct paths')
+                self.textEdit.append('Укажите правильный путь')
                 print(e)
         else:
-            self.textEdit.append('Please select paths')
+            self.textEdit.append('Пути к файлам указаны неверно или не указаны')
         
     
 
@@ -90,14 +91,14 @@ class ExampleApp(QtWidgets.QMainWindow, GUI2.Ui_MainWindow): #####MAIN#####
 
     def browse_folder(self):
         self.lineEdit.clear()
-        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите папку")
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите папку с неклассифицированными документами")
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
             
             self.lineEdit.setText(directory)   # добавить файл в listWidget
 
     def browse_model(self):
         self.lineEdit_2.clear()
-        directory = QtWidgets.QFileDialog.getOpenFileName(self, "Выберите файл")
+        directory = QtWidgets.QFileDialog.getOpenFileName(self, "Выберите файл модели")
         print("##########################################3", directory[0])
         if directory:  # не продолжать выполнение, если пользователь не выбрал директорию
            
@@ -107,7 +108,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI2.Ui_MainWindow): #####MAIN#####
     def use(self, modelname):
     
         if not (os.path.isdir(self.lineEdit.text()) and os.path.isfile(self.lineEdit_2.text())):
-            self.textEdit.append('Укажите правильный путь')
+            self.textEdit.append('Путь к документам и/или файлу модели указан неверно')
             return
 
         try:
@@ -116,7 +117,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI2.Ui_MainWindow): #####MAIN#####
 
             fc.rename(self.lineEdit.text(), self.lineEdit_2.text(), pred)
         except OSError:
-            self.textEdit.append('Укажите пр')
+            self.textEdit.append('Укажи')
 
     
 
@@ -137,6 +138,7 @@ class ExampleApp(QtWidgets.QMainWindow, GUI2.Ui_MainWindow): #####MAIN#####
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
     main_window = ExampleApp()  # Создаём объект класса ExampleApp
+    app.setWindowIcon(QtGui.QIcon('icon.ico'))
     main_window.show()  # Показываем окно
     dial = ExampleAppDialog()
     app.exec_()  # и запускаем приложение
